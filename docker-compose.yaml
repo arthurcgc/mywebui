@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./data:/app/backend/data
+    environment:
+      # Ollama Configuration
+      - OLLAMA_BASE_URL=http://192.168.15.13:11434
+      
+      # Authentication
+      - WEBUI_AUTH=False
+      
+      # Tavily API Key (loaded from .env file)
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      
+      # Web Search Settings
+      - ENABLE_RAG_WEB_SEARCH=True
+      - RAG_WEB_SEARCH_ENGINE=tavily
+      - ENABLE_SEARCH_QUERY_GENERATION=True
+      - RAG_WEB_SEARCH_RESULT_COUNT=10
+      - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=3
+      
+      # RAG/Embedding Settings
+      - RAG_EMBEDDING_MODEL=mxbai-embed-large:latest
+      - CHUNK_SIZE=1000
+      - CHUNK_OVERLAP=200
+      - RAG_TOP_K=5
+
+      # Timeouts
+      - AIOHTTP_CLIENT_TIMEOUT=300
+
+      # Task models - use Qwen 2.5 7B for everything
+      - TASK_MODEL=qwen2.5:7b-instruct-q4_K_M
+      - TASK_MODEL_EXTERNAL=qwen2.5:7b-instruct-q4_K_M
